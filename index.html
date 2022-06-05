@@ -1,8 +1,9 @@
+<html>
 <py-env>
-- Pillow
-- matplotlib
-- scikit-image
-- numpy
+    - Pillow
+    - matplotlib
+    - scikit-image
+    - numpy
 </py-env>
 
 <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
@@ -19,7 +20,7 @@
                 <option value="🦞">🦞</option>
                 <option value="🌯">🌯</option>
                 <option value="🎭">🎭</option>
-              </select>
+            </select>
         </div>
         <div class="grid grid-cols-2">
             <p class="post-p">Select a Filter:</p>
@@ -33,12 +34,14 @@
     </div>
     <div id="images" class="flex flex-col w-auto space-x-4 border-green-300 divide-x-2 md:flex-row">
         <div class="grow">
-        <p class="w-full text-lg font-semibold text-center underline">Original Image</p>
-        <div id="original_image"></div>
+            <p class="w-full text-lg font-semibold text-center underline">Original Image</p>
+            <div id="original_image"></div>
         </div>
         <div class="grow">
-        <p class="w-full text-lg font-semibold text-center underline">Processed Image</p>
-        <div id="new_image"></div>
+            <p class="w-full text-lg font-semibold text-center underline">Processed Image</p>
+            <div id="new_image"></div>
         </div>
     </div>
 </div>
+
+</html>
