@@ -12,7 +12,7 @@ from functools import partial
 from skimage.transform import swirl, PiecewiseAffineTransform, warp
 from skimage.filters import butterworth
 
-current_emoji = "🤖"
+current_emoji = "🦴"
 current_filter_name = "swirl"
 
 emoji_data: dict[str, np.array] = {}
