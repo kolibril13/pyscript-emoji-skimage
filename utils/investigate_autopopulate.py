@@ -15,7 +15,7 @@ def main() -> None:
     #print function summary for all functions in a submodule
     #print_module_function_summary(skimage.transform)
 
-    print_function_info(skimage.transform.pyramid_laplacian)
+    print_function_info(skimage.exposure.adjust_gamma)
 
     #Or print function summaries for ALL modules (long):
     """ for m in get_all_skimage_modules():
@@ -116,7 +116,9 @@ def print_all_functions_from_all_modules():
 def print_function_info(f:object, print_header=True) -> None:
     sig = inspect.signature(f)
     txt = "{name:<20}{kind:<25}{default:<25}{annotation}"
-    if print_header: print(txt.format(name="Func", kind="Argument Kind", default="Default Value", annotation="Annotation"))
+    if print_header: 
+        print(f"Function {f.__name__}:")
+        print(txt.format(name="Func", kind="Argument Kind", default="Default Value", annotation="Annotation"))
     for param in sig.parameters.values():
         print(txt.format(name=param.name, kind=param.kind, default= str(param.default), annotation = str(param.annotation) if param.annotation != inspect._empty else 'No Annotation'))
     
