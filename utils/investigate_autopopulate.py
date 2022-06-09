@@ -10,15 +10,15 @@ def main() -> None:
     #print_all_functions_from_all_modules()
 
     #print function argument info for all functions within a submodule
-    #print_module_function_info_signature(skimage.transform)
+    print_module_function_info(skimage.transform)
 
     #print function summary for all functions in a submodule
     #print_module_function_summary(skimage.transform)
 
     #Or print function summaries for ALL modules (long):
-    for m in get_all_skimage_modules():
+    """ for m in get_all_skimage_modules():
         print_module_function_summary(m)
-        print("\n------\n")
+        print("\n------\n") """
 
     #Print number of member functions for all modules, with how many require a single argument and how many require more than one (with no default)
     #print_all_module_summary()
@@ -40,13 +40,12 @@ def print_module_function_info(m:object) -> None:
         print(f"--- Function {f.__name__} ---")
         required_args, optional_args = get_function_arg_info(f)
 
-        for data in required_args:
-            req, param = data
-            print(f"\t{req:<20}{param.kind:<25}REQUIRED")
+        for param in required_args:
+            print(f"\t{param.name:<20}{param.kind:<25}REQUIRED")
 
-        for data in optional_args:
-            opt, param = data
-            print(f"\t{opt:<20}{param.kind:<25}{str(param.default):<25}{str(param.kind):<30}")
+        for param in optional_args:
+            print(f"\t{param.name:<20}{param.kind:<25}{str(param.default):<25}{str(param.kind):<30}")
+        print("")
 
 #Print short info about all the functions in a module, including which functions have more than 1 required argument and the names of those arguments
 def print_module_function_summary(m:object) -> None:
