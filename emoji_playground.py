@@ -1,19 +1,21 @@
 from PIL import Image
 
-from js import document, console, Uint8Array, window, File
-from pyodide import create_proxy
-from pyodide.http import pyfetch
+from js import document, console, Uint8Array, window, File #type: ignore
+from pyodide import create_proxy #type: ignore
+from pyodide.http import pyfetch #type: ignore
 import asyncio
 import io
 import numpy as np
-from numpy import asarray
 from functools import partial
+# all 'paths' loads in py-env are in flat file structure:
+# from utils.investigate_autopopulate import get_function_arg_info
+from investigate_autopopulate import get_all_skimage_modules, get_child_functions, get_function_arg_info #type: ignore
 
 from skimage.transform import swirl, PiecewiseAffineTransform, warp
 from skimage.filters import butterworth
 
 current_emoji = "🦴"
-current_filter_name = "swirl"
+current_filter_name = None #populated at end of loading
 
 emoji_data: dict[str, np.array] = {}
 
@@ -46,12 +48,50 @@ def affine_filter(my_array: np.array) -> np.array:
 def butterworth_filter(my_array: np.array, frequency = 0.1, high_pass=False, order=8.0) -> np.array:
     return butterworth(my_array, frequency, high_pass=high_pass, order=order)
 
-filter_names = {
+filter_names_manual = {
     "swirl": swirl_filter,
     "affine": affine_filter,
     "butterworth_low": partial(butterworth_filter, high_pass=False, order=8.0),
     "butterworth_high": partial(butterworth_filter, frequency = 0.01, high_pass=True, order=8.0)
 }
+
+#filter_names = filter_names_manual
+
+auto_filters = {}
+
+def get_all_viable_filters() -> dict:
+    result = {}
+    for module in get_all_skimage_modules():
+        for function in get_child_functions(module):
+            req, opt = get_function_arg_info(function)
+            if len(req) == 1 and req[0].name.lower() == 'image':
+                result[function.__name__] = {"func" : function, "module": module}
+
+    console.log(f"Aded {len(result)} viable filters with one required argument called 'image'")
+    return result
+
+def populate_filters(filter_dict:dict, selector_id = "filter-selector") -> None:
+    selector = document.getElementById(selector_id)
+    global current_filter_name
+
+    #get list of all modules with viable functions
+    for module_name in {filter_dict[func]["module"].__name__ for func in filter_dict}:
+        optgroup = document.createElement("optgroup")
+        optgroup.label = module_name
+        for module_function in [func for func in filter_dict if filter_dict[func]["module"].__name__ == module_name]:
+            if current_filter_name is None: 
+                current_filter_name = module_function
+            option = document.createElement("option")
+            option.innerText = module_function
+            option.value = module_function
+            optgroup.appendChild(option)
+            auto_filters[module_function] = filter_dict[module_function]["func"]
+        selector.appendChild(optgroup)
+
+populate_filters(get_all_viable_filters())
+console.log(str(auto_filters))
+
+filter_names = auto_filters
 
 async def get_emoji_bytes(url: str):
     response = await pyfetch(url)
