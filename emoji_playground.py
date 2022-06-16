@@ -62,10 +62,11 @@ auto_filters = {}
 def get_all_viable_filters() -> dict:
     result = {}
     for module in get_all_skimage_modules():
+        result[module.__name__] = []
         for function in get_child_functions(module):
             req, opt = get_function_arg_info(function)
             if len(req) == 1 and req[0].name.lower() == 'image':
-                result[function.__name__] = {"func" : function, "module": module}
+                result[module.__name__].append(function)
 
     console.log(f"Aded {len(result)} viable filters with one required argument called 'image'")
     return result
@@ -75,17 +76,18 @@ def populate_filters(filter_dict:dict, selector_id = "filter-selector") -> None:
     global current_filter_name
 
     #get list of all modules with viable functions
-    for module_name in {filter_dict[func]["module"].__name__ for func in filter_dict}:
+    for module_name in filter_dict:
         optgroup = document.createElement("optgroup")
         optgroup.label = module_name
-        for module_function in [func for func in filter_dict if filter_dict[func]["module"].__name__ == module_name]:
+        for module_function in filter_dict[module_name]:
+            function_name = module_function.__name__
             if current_filter_name is None: 
-                current_filter_name = module_function
+                current_filter_name = function_name
             option = document.createElement("option")
-            option.innerText = module_function
-            option.value = module_function
+            option.innerText = function_name
+            option.value = function_name
             optgroup.appendChild(option)
-            auto_filters[module_function] = filter_dict[module_function]["func"]
+            auto_filters[function_name] = module_function
         selector.appendChild(optgroup)
 
 populate_filters(get_all_viable_filters())
