@@ -14,11 +14,13 @@ concurrency: preview-${{ github.ref }}
 jobs:
   deploy-preview:
     runs-on: ubuntu-20.04
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        
       - name: Deploy preview
         uses: rossjrw/pr-preview-action@v1
         with:
           source-dir: .
-          preview-branch: main
+          preview-branch: gh-pages
