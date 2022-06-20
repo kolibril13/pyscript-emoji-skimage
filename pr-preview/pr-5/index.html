@@ -1,0 +1,82 @@
+<html>
+
+<head>
+
+    <title>Emoji-Skimage</title>
+    <link rel="icon" type="image/svg+xml" href="icon_bone.svg">
+
+    <!--
+    Import tailwind js to dnyamical add styleing to tailwind classes
+    "Not the best choice for production" says Tailwind, but will do for now 
+    -->
+    <script src="https://cdn.tailwindcss.com/"></script>
+    <script>
+        function myNewFunction() {
+            var sel = document.getElementById("emoji-selector")
+            let emoji = sel.options[sel.selectedIndex].text;
+            let emoji_code = [...emoji].map(e => e.codePointAt(0).toString(16)).join(`-`).toUpperCase();
+            var sel2 = document.getElementById("filter-selector")
+            let filter_name = sel2.options[sel2.selectedIndex].text;
+            let filter_name_clean = filter_name.split(' ').join('_')
+
+            website_name = "https://kolibril13.github.io/pyscript-emoji-skimage/"
+            complete_string = website_name + emoji_code + '-' + filter_name_clean;
+            document.getElementById("demo").innerHTML = complete_string;
+        }
+    </script>
+</head>
+
+<body>
+    <!-- <py-env>
+        - Pillow
+        - matplotlib
+        - scikit-image
+        - numpy
+    </py-env>
+
+    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+    <py-script src="./emoji_playground.py">
+    </py-script> -->
+    <div class="p-2 bg-orange-50 m-8 border-2">
+        <div class="flex flex-row space-x-12">
+            <div class="grid grid-cols-2">
+                <p class="">Select an Emoji:</p>
+                <select id="emoji-selector" class="text-2xl" onChange="myNewFunction();">
+                    <option value="🦴">🦴</option>
+                    <option value="🤖">🤖</option>
+                    <option value="👨‍🎨">👨‍🎨</option>
+                    <option value="🧠">🧠</option>
+                    <option value="🦞">🦞</option>
+                    <option value="🫀">🫀</option>
+                    <option value="🎭">🎭</option>
+                </select>
+            </div>
+            <div class="grid grid-cols-2">
+                <p class="">Select a Filter:</p>
+                <select id="filter-selector" onChange="myNewFunction();">
+                    <option value="swirl">Swirl</option>
+                    <option value="affine">Affine Filter</option>
+                    <option value="butterworth_low">Butterworth Low Pass</option>
+                    <option value="butterworth_high">Butterworth High Pass</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <p id="demo"></p>
+
+
+    <!-- <div class="p-2 bg-orange-50 m-8 border-2">
+        <div id="images" class="flex flex-col w-auto space-x-4 border-green-300 divide-x-2 md:flex-row">
+            <div class="grow">
+                <p class="w-full text-lg font-semibold text-center underline">Original Image</p>
+                <div id="original_image" class="justify-center flex"></div>
+            </div>
+            <div class="grow">
+                <p class="w-full text-lg font-semibold text-center underline">Processed Image</p>
+                <div id="new_image" class="justify-center flex"></div>
+            </div>
+        </div>
+    </div> -->
+</body>
+
+</html>
