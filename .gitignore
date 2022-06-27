@@ -131,3 +131,5 @@ dmypy.json
 poetry.lock
 
 emoji_skimage_env
+
+*.DS_Store
