@@ -35,6 +35,16 @@ def get_child_modules(m:object) -> List:
 def get_all_skimage_modules() -> List:
     return [member for _, member in inspect.getmembers(skimage) if inspect.ismodule(member)]
 
+#Returns a tuple of two list - the first is the required arguments for the given function, the second is the optional arguments
+def get_function_arg_info(f:object) -> tuple:
+    sig = inspect.signature(f)
+    required_args = [param for _, param in sig.parameters.items() if param.default == inspect._empty and param.kind != inspect.Parameter.VAR_KEYWORD]
+    optional_args = [param for _, param in sig.parameters.items() if param not in required_args]
+    return required_args, optional_args
+
+def is_basic_filter(f:object) -> bool:
+    pass
+
 #Prints detailed info of the functions for a single module, along with their argument types and default, if any
 def print_module_function_info(m:object) -> None:
     print(f"--- Info for module {m.__name__} ---")
@@ -96,13 +106,6 @@ def print_all_module_summary() -> None:
         
         print(txt.format(name=module.__name__, functions=len(get_child_functions(module)), one_req=len(functions_with_one_req), more_req=len(functions_more_req)))
     print(txt.format(name="TOTAL", functions=total_functions, one_req=total_one, more_req=total_more))
-
-#Returns a tuple of two list - the first is the required arguments for the given function, the second is the optional arguments
-def get_function_arg_info(f:object) -> tuple:
-    sig = inspect.signature(f)
-    required_args = [param for _, param in sig.parameters.items() if param.default == inspect._empty and param.kind != inspect.Parameter.VAR_KEYWORD]
-    optional_args = [param for _, param in sig.parameters.items() if param not in required_args]
-    return required_args, optional_args
 
 #Print a brief list of all functions in each module of skimage
 def print_all_functions_from_all_modules():
