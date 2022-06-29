@@ -21,6 +21,26 @@ current_filter_name = "swirl"
 
 emoji_data: dict[str, np.array] = {}
 
+from skimage.transform import radon, rescale
+from skimage.color import rgb2gray, gray2rgb
+
+
+def radon_iradon(emoji_data: np.array)-> np.array:
+    image = rgb2gray(emoji_data[:,:,:3]) # remove alpha channel and convert to gray
+    #image = rescale(image, scale=0.5, mode='reflect', channel_axis=None)
+
+    theta = np.linspace(0., 180., max(image.shape), endpoint=False)
+    sinogram = radon(image, theta=theta)
+    dx, dy = 0.5 * 180.0 / max(image.shape), 0.5 / sinogram.shape[0]
+
+
+    from skimage.transform import iradon
+
+    reconstruction_fbp = iradon(sinogram[2:], theta=theta, filter_name='shepp-logan')
+    return gray2rgb(reconstruction_fbp)
+
+
+
 def swirl_filter(my_array: np.array) -> np.array:
     return swirl(my_array, rotation = 0, strength = 15, radius = 300)
 
@@ -54,7 +74,8 @@ filter_names = {
     "swirl": swirl_filter,
     "affine": affine_filter,
     "butterworth_low": partial(butterworth_filter, high_pass=False, order=8.0),
-    "butterworth_high": partial(butterworth_filter, frequency = 0.01, high_pass=True, order=8.0)
+    "butterworth_high": partial(butterworth_filter, frequency = 0.01, high_pass=True, order=8.0),
+    "radon_iradon" : radon_iradon
 }
 
 async def get_emoji_bytes(url: str):
