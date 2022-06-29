@@ -17,65 +17,36 @@ from skimage.transform import swirl, PiecewiseAffineTransform, warp
 from skimage.filters import butterworth
 
 current_emoji = "🦴"
-current_filter_name = "swirl"
+current_filter_name = "radon_iradon"
 
 emoji_data: dict[str, np.array] = {}
 
 from skimage.transform import radon, rescale
-from skimage.color import rgb2gray, gray2rgb
+from skimage.color import rgba2rgb,rgb2gray, gray2rgb
+from skimage.transform import iradon
 
 
-def radon_iradon(emoji_data: np.array)-> np.array:
-    image = rgb2gray(emoji_data[:,:,:3]) # remove alpha channel and convert to gray
-    #image = rescale(image, scale=0.5, mode='reflect', channel_axis=None)
-
+def radon_iradon(emoji_data):
+    image = rgb2gray(rgba2rgb(emoji_data)) # remove alpha channel and convert to gray
+    image = rescale(image, scale=0.5, mode='reflect', channel_axis=None)
     theta = np.linspace(0., 180., max(image.shape), endpoint=False)
     sinogram = radon(image, theta=theta)
-    dx, dy = 0.5 * 180.0 / max(image.shape), 0.5 / sinogram.shape[0]
+    reconstruction_fbp = iradon(sinogram, theta=theta, filter_name='shepp-logan')
+    return gray2rgb(abs(reconstruction_fbp))
 
 
-    from skimage.transform import iradon
-
-    reconstruction_fbp = iradon(sinogram[2:], theta=theta, filter_name='shepp-logan')
-    return gray2rgb(reconstruction_fbp)
-
-
-
-def swirl_filter(my_array: np.array) -> np.array:
-    return swirl(my_array, rotation = 0, strength = 15, radius = 300)
-
-def affine_filter(my_array: np.array) -> np.array:
-    rows, cols = my_array.shape[0], my_array.shape[1]
-
-    src_cols = np.linspace(0, cols, 20)
-    src_rows = np.linspace(0, rows, 10)
-    src_rows, src_cols = np.meshgrid(src_rows, src_cols)
-    src = np.dstack([src_cols.flat, src_rows.flat])[0]
-
-    # add sinusoidal oscillation to row coordinates
-    dst_rows = src[:, 1] - np.sin(np.linspace(0, 3 * np.pi, src.shape[0])) * 50
-    dst_cols = src[:, 0]
-    dst_rows *= 1.5
-    dst_rows -= 1.5 * 50
-    dst = np.vstack([dst_cols, dst_rows]).T
-
-
-    tform = PiecewiseAffineTransform()
-    tform.estimate(src, dst)
-
-    out_rows = my_array.shape[0] - 1.5 * 50
-    out_cols = cols
-    return warp(my_array, tform, output_shape=(out_rows, out_cols))
-
-def butterworth_filter(my_array: np.array, frequency = 0.1, high_pass=False, order=8.0) -> np.array:
-    return butterworth(my_array, frequency, high_pass=high_pass, order=order)
+def radon_iradon_missing(emoji_data):
+    image = rgb2gray(rgba2rgb(emoji_data)) # remove alpha channel and convert to gray
+    image = rescale(image, scale=0.5, mode='reflect', channel_axis=None)
+    theta = np.linspace(0., 180., max(image.shape), endpoint=False)
+    sinogram = radon(image, theta=theta)
+    reconstruction_fbp = iradon(sinogram[:,:-100], theta=theta[:-100], filter_name='shepp-logan')
+    return gray2rgb(abs(reconstruction_fbp))
 
 filter_names = {
-    "swirl": swirl_filter,
-    "affine": affine_filter,
-    "butterworth_low": partial(butterworth_filter, high_pass=False, order=8.0),
-    "butterworth_high": partial(butterworth_filter, frequency = 0.01, high_pass=True, order=8.0),
-    "radon_iradon" : radon_iradon
+    "radon_iradon" : radon_iradon,
+    "radon_iradon_missing" : radon_iradon_missing
+
 }
 
 async def get_emoji_bytes(url: str):
