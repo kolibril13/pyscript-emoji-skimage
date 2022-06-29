@@ -31,8 +31,9 @@ def radon_iradon(emoji_data):
     image = rescale(image, scale=0.5, mode='reflect', channel_axis=None)
     theta = np.linspace(0., 180., max(image.shape), endpoint=False)
     sinogram = radon(image, theta=theta)
-    reconstruction_fbp = iradon(sinogram, theta=theta, filter_name='shepp-logan')
-    return gray2rgb(abs(reconstruction_fbp))
+    reconstruction_fbp = iradon(sinogram, theta= theta, filter_name='shepp-logan')
+    reconstruction_fbp = np.clip(gray2rgb(reconstruction_fbp)/0.5, 0,1)
+    return reconstruction_fbp
 
 
 def radon_iradon_missing(emoji_data):
@@ -41,7 +42,8 @@ def radon_iradon_missing(emoji_data):
     theta = np.linspace(0., 180., max(image.shape), endpoint=False)
     sinogram = radon(image, theta=theta)
     reconstruction_fbp = iradon(sinogram[:,:-100], theta=theta[:-100], filter_name='shepp-logan')
-    return gray2rgb(abs(reconstruction_fbp))
+    reconstruction_fbp = np.clip(gray2rgb(reconstruction_fbp)/0.5, 0,1)
+    return reconstruction_fbp
 
 filter_names = {
     "radon_iradon" : radon_iradon,
