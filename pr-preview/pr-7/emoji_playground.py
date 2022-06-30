@@ -23,7 +23,7 @@ current_filter_name = "radon_iradon"
 emoji_data: dict[str, np.array] = {}
 
 from skimage.transform import radon, rescale
-from skimage.color import rgba2rgb,rgb2gray, gray2rgb
+from skimage.color import rgba2rgb,rgb2gray
 from skimage.transform import iradon
 
 
