@@ -1,3 +1,4 @@
+from re import X
 from PIL import Image
 import sys
 
@@ -32,8 +33,8 @@ def radon_iradon(emoji_data):
     theta = np.linspace(0., 180., max(image.shape), endpoint=False)
     sinogram = radon(image, theta=theta)
     reconstruction_fbp = iradon(sinogram, theta= theta, filter_name='shepp-logan')
-    reconstruction_fbp = np.clip(gray2rgb(reconstruction_fbp)/0.5, 0,1)
-    return reconstruction_fbp
+    new1 = np.clip((reconstruction_fbp)/0.9, 0,1)
+    return new1
 
 
 def radon_iradon_missing(emoji_data):
@@ -42,8 +43,8 @@ def radon_iradon_missing(emoji_data):
     theta = np.linspace(0., 180., max(image.shape), endpoint=False)
     sinogram = radon(image, theta=theta)
     reconstruction_fbp = iradon(sinogram[:,:-100], theta=theta[:-100], filter_name='shepp-logan')
-    reconstruction_fbp = np.clip(gray2rgb(reconstruction_fbp)/0.5, 0,1)
-    return reconstruction_fbp
+    new1 = np.clip((reconstruction_fbp)/0.9, 0,1)
+    return new1
 
 filter_names = {
     "radon_iradon" : radon_iradon,
@@ -89,9 +90,9 @@ async def _emoji_data(emoji_name: str) -> np.array:
     return emoji_data[emoji_name]
 
 def array_to_image(data:np.array) -> Image:
-    if data[row:= 0][column:= 0][red:= 0] < .99:
+    if isinstance(data.flatten()[0], np.float64):
         # Many transforms represent RGB as floats in the range 0-1, which pillow does not like
-        # This converts their values back to 0-255
+        # This converts their values back to uint8 0-255
         return Image.fromarray((data*255).astype(np.uint8)) 
     else:
         return Image.fromarray(data.astype(np.uint8))
