@@ -83,7 +83,7 @@ def radon180_but_less_images(emoji_data, less = 20):
     return new1
 
 def nur_2_bilder(emoji_data):
-    return tomo_missing_angle_clip(emoji_data, fromangle= 0,toangle = 2) + tomo_missing_angle_clip(emoji_data, fromangle= 90,toangle = 91)
+    return (tomo_missing_angle_clip(emoji_data, fromangle= 0,toangle = 2) + tomo_missing_angle_clip(emoji_data, fromangle= 90,toangle = 91))/2
 
 def jedes_40ste_Bild(emoji_data):
     return radon180_but_less_images(emoji_data, less = 40)
@@ -97,14 +97,20 @@ def jedes_10ste_Bild(emoji_data):
 def jedes_5te_Bild(emoji_data):
     return radon180_but_less_images(emoji_data, less = 5)
 
+
+
 filter_names = {
     "good_tomo" : good_tomo,
     "nur_2_bilder" : nur_2_bilder,
     "jedes_40ste_Bild" :jedes_40ste_Bild,
     "jedes_10ste_Bild" : jedes_10ste_Bild,
     "jedes_5te_Bild" : jedes_5te_Bild,
-
-
+    "m0to10": lambda emoji_data: tomo_missing_angle_cutout(emoji_data, fromangle= 0,toangle = 10),
+    "m0to30": lambda emoji_data: tomo_missing_angle_cutout(emoji_data, fromangle= 0,toangle = 30),
+    "m30to60": lambda emoji_data: tomo_missing_angle_cutout(emoji_data, fromangle= 30,toangle = 60),
+    "m130to160": lambda emoji_data: tomo_missing_angle_cutout(emoji_data, fromangle= 130,toangle = 160),
+    "m0to90": lambda emoji_data: tomo_missing_angle_cutout(emoji_data, fromangle= 0,toangle = 90),
+    "m90to180": lambda emoji_data: tomo_missing_angle_cutout(emoji_data, fromangle= 90,toangle = 180)
 }
 
 async def get_emoji_bytes(url: str):
