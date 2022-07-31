@@ -91,7 +91,7 @@ async def _emoji_data(emoji_name: str) -> np.array:
     return emoji_data[emoji_name]
 
 def array_to_image(data:np.array) -> Image:
-    if data[row:= 0][column:= 0][red:= 0] < .99:
+    if isinstance(data.item(0), float):
         # Many transforms represent RGB as floats in the range 0-1, which pillow does not like
         # This converts their values back to 0-255
         return Image.fromarray((data*255).astype(np.uint8)) 
