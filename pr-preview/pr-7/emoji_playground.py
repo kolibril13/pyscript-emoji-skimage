@@ -17,17 +17,19 @@ from functools import partial
 from skimage.transform import swirl, PiecewiseAffineTransform, warp
 from skimage.filters import butterworth
 
-current_emoji = "🦴"
-current_filter_name = "radon_iradon"
-
-emoji_data: dict[str, np.array] = {}
 
 from skimage.transform import radon, rescale
 from skimage.color import rgba2rgb,rgb2gray
 from skimage.transform import iradon
 
+current_emoji = "🦴"
+current_filter_name = "good_tomo"
 
-def radon_iradon(emoji_data):
+emoji_data: dict[str, np.array] = {}
+
+
+
+def good_tomo(emoji_data):
     image = rgb2gray(rgba2rgb(emoji_data)) # remove alpha channel and convert to gray
     image = rescale(image, scale=0.5, mode='reflect', channel_axis=None)
     theta = np.linspace(0., 180., max(image.shape), endpoint=False)
@@ -37,18 +39,71 @@ def radon_iradon(emoji_data):
     return new1
 
 
-def radon_iradon_missing(emoji_data):
+def tomo_missing_angle_clip(emoji_data,fromangle,toangle):
+    total_angle = 180
+    image = rgb2gray(rgba2rgb(emoji_data)) # remove alpha channel and convert to gray
+    image = rescale(image, scale=0.5, mode='reflect', channel_axis=None)
+    fromangle = int(fromangle* max(image.shape)/total_angle)  # TODO radon images = max(image.shape) and angle = 180
+    toangle = int(toangle* max(image.shape)/total_angle )
+    theta = np.linspace(0., total_angle, max(image.shape), endpoint=False)
+    sinogram = radon(image, theta=theta)
+
+    theta = theta[fromangle:toangle]
+    sinogram=sinogram[:,fromangle:toangle]
+
+    reconstruction_fbp = iradon(sinogram, theta=theta, filter_name='shepp-logan')
+    new1 = np.clip((reconstruction_fbp)/0.9, 0,1)
+    return new1
+    
+def tomo_missing_angle_cutout(emoji_data,fromangle,toangle):
+    total_angle = 180
+    image = rgb2gray(rgba2rgb(emoji_data)) # remove alpha channel and convert to gray
+    image = rescale(image, scale=0.5, mode='reflect', channel_axis=None)
+    fromangle = int(fromangle* max(image.shape)/total_angle)  # TODO radon images = max(image.shape) and angle = 180
+    toangle = int(toangle* max(image.shape)/total_angle )
+    theta = np.linspace(0., total_angle, max(image.shape), endpoint=False)
+    sinogram = radon(image, theta=theta)
+
+
+    theta = np.delete(theta, range(fromangle,toangle), axis=0)
+    sinogram = np.delete(sinogram, range(fromangle,toangle), axis=1)
+    
+    reconstruction_fbp = iradon(sinogram, theta=theta, filter_name='shepp-logan')
+    new1 = np.clip((reconstruction_fbp)/0.9, 0,1)
+    return new1
+
+
+def radon180_but_less_images(emoji_data, less = 20):
     image = rgb2gray(rgba2rgb(emoji_data)) # remove alpha channel and convert to gray
     image = rescale(image, scale=0.5, mode='reflect', channel_axis=None)
     theta = np.linspace(0., 180., max(image.shape), endpoint=False)
     sinogram = radon(image, theta=theta)
-    reconstruction_fbp = iradon(sinogram[:,:-100], theta=theta[:-100], filter_name='shepp-logan')
+    reconstruction_fbp = iradon(sinogram[:,::less], theta=theta[::less], filter_name='shepp-logan')
     new1 = np.clip((reconstruction_fbp)/0.9, 0,1)
     return new1
 
+def nur_2_bilder(emoji_data):
+    return tomo_missing_angle_clip(emoji_data, fromangle= 0,toangle = 2) + tomo_missing_angle_clip(emoji_data, fromangle= 90,toangle = 91)
+
+def jedes_40ste_Bild(emoji_data):
+    return radon180_but_less_images(emoji_data, less = 40)
+
+def jedes_20ste_Bild(emoji_data):
+    return radon180_but_less_images(emoji_data, less = 20)
+
+def jedes_10ste_Bild(emoji_data):
+    return radon180_but_less_images(emoji_data, less = 10)
+
+def jedes_5te_Bild(emoji_data):
+    return radon180_but_less_images(emoji_data, less = 5)
+
 filter_names = {
-    "radon_iradon" : radon_iradon,
-    "radon_iradon_missing" : radon_iradon_missing
+    "good_tomo" : good_tomo,
+    "nur_2_bilder" : nur_2_bilder,
+    "jedes_40ste_Bild" :jedes_40ste_Bild,
+    "jedes_10ste_Bild" : jedes_10ste_Bild,
+    "jedes_5te_Bild" : jedes_5te_Bild,
+
 
 }
 
