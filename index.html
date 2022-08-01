@@ -1,18 +1,21 @@
 <html>
 
 <head>
-    
+
     <title>Emoji-Skimage</title>
     <link rel="icon" type="image/svg+xml" href="icon_bone.svg">
-      
+
     <!--
     Import tailwind js to dnyamical add styleing to tailwind classes
     "Not the best choice for production" says Tailwind, but will do for now 
     -->
     <script src="https://cdn.tailwindcss.com/"></script>
+    <link rel="stylesheet" href="./drag_drop.css">
 </head>
 
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/compare_view@1.3.0/public/dist/browser_compare_view.js"></script>
+    <script src="./drag_drop.js"></script>
     <py-env>
         - Pillow
         - matplotlib
@@ -60,6 +63,54 @@
             </div>
         </div>
     </div>
+
+    <div class="imgs_wrapper">
+        <div class="img">
+            <div>Drag&amp;Drop Image Here for Comparison</div>
+        </div>
+        <div class="img">
+            <div>Drag&amp;Drop Image Here for Comparison</div>
+        </div>
+        <div class="img">
+            <div>Drag&amp;Drop Image Here for Comparison</div>
+        </div>
+        <div class="img">
+            <div>Drag&amp;Drop Image Here for Comparison</div>
+        </div>
+    </div>
+
+    <div style="display: flex; flex-direction: row; width: 100%;">
+        <div>
+            <canvas id="canvas" style="width: 100%;"></canvas>
+        </div>
+        <div id="controls" style="width: 120px;">
+        </div>
+    </div>
+    <script>
+        compare_view.load(
+            [
+                "./cat.png",
+                "./cat_grey.png",
+            ],
+            "canvas",
+            {
+                controls_id: "controls",
+            },
+            (cvd) => {
+                load_img_drop([
+                    "./cat.png",
+                    "./cat_grey.png",
+                    undefined,
+                    undefined,
+                    undefined,
+                ], (image_urls) => {
+                    // TODO: remove debug
+                    console.log(image_urls);
+                    compare_view.load_new_imgs(cvd, image_urls);
+                });
+            }
+        );
+    </script>
 </body>
 
 </html>
