@@ -61,9 +61,16 @@
                 <p class="w-full text-lg font-semibold text-center underline">Processed Image</p>
                 <div id="new_image" class="justify-center flex"></div>
             </div>
+            <div class="grow">
+                <p class="w-full text-lg font-semibold text-center underline">compare_view</p>
+                <div class="justify-center flex">
+                    <canvas style="width: 100%;" id="canvas"></canvas>
+                </div>
+            </div>
         </div>
     </div>
 
+    <h1>Drag Zones</h1>
     <div class="drag_targets">
         <div class="drag_target">
             <div>Drag&amp;Drop Image Here</div>
@@ -73,7 +80,6 @@
         </div>
     </div>
 
-    <canvas id="canvas"></canvas>
     <script>
         compare_view.load(
             [
