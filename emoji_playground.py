@@ -152,11 +152,6 @@ if "pyodide" in sys.modules:
     select_filter_and_display = create_proxy( _select_filter_and_display)
     document.getElementById("filter-selector").addEventListener("change",  select_filter_and_display)
 
-    async def _call_fetch_and_display(): # no idea if this is the right way of doing this
-        await _fetch_and_display()
+await _fetch_and_display()
 
-    _call_fetch_and_display()
-
-
-
-x=1 #Prevents an apparent error of Pyscript trying to write its final value to the DOM
+x = 1  # Prevents an apparent error of Pyscript trying to write its final value to the DOM
