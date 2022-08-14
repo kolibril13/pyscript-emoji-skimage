@@ -1,8 +1,12 @@
 from PIL import Image
+import sys
 
-from js import document, console, Uint8Array, window, File
-from pyodide import create_proxy
-from pyodide.http import pyfetch
+if "pyodide" in sys.modules:
+   # running in Pyodide
+    from js import document, console, Uint8Array, window, File
+    from pyodide import create_proxy
+    from pyodide.http import pyfetch
+    
 import asyncio
 import io
 import numpy as np
@@ -134,18 +138,20 @@ async def _fetch_and_display():
     original_image.src = window.URL.createObjectURL(original_image_file)
     document.getElementById("original_image").appendChild(original_image)
 
-select_emoji_and_display = create_proxy( _select_emoji_and_display)
-document.getElementById("emoji-selector").addEventListener("change",  select_emoji_and_display)
-
-select_filter_and_display = create_proxy( _select_filter_and_display)
-document.getElementById("filter-selector").addEventListener("change",  select_filter_and_display)
-
 def remove_all_children(parent_id: str):
     parent = document.getElementById(parent_id)
 
     while parent.firstChild is not None:
         parent.removeChild(parent.firstChild)
 
+if "pyodide" in sys.modules:
+
+    select_emoji_and_display = create_proxy( _select_emoji_and_display)
+    document.getElementById("emoji-selector").addEventListener("change",  select_emoji_and_display)
+
+    select_filter_and_display = create_proxy( _select_filter_and_display)
+    document.getElementById("filter-selector").addEventListener("change",  select_filter_and_display)
+
 await _fetch_and_display()
 
-x=1 #Prevents an apparent error of Pyscript trying to write its final value to the DOM
+x = 1  # Prevents an apparent error of Pyscript trying to write its final value to the DOM
